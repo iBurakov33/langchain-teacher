@@ -1,9 +1,9 @@
 import langchain
 from langchain.callbacks.base import BaseCallbackHandler
-from langchain.chat_models import ChatOpenAI, ChatAnthropic
 from langchain.schema import HumanMessage, AIMessage
 import streamlit as st
 from langsmith import Client
+from langchain.chat_models import ChatOllama
 client = Client()
 
 
@@ -29,7 +29,7 @@ class StreamHandler(BaseCallbackHandler):
         self.text += token
         self.container.markdown(self.text)
 
-from langchain.chat_models import ChatOpenAI
+
 
 
 content = """Follow the below lesson plan, using information from the blog, cookbook, and interface guide.
@@ -88,8 +88,7 @@ if prompt := st.chat_input():
 
     with st.chat_message("assistant"):
         stream_handler = StreamHandler(st.empty())
-        model = ChatOpenAI(streaming=True, callbacks=[stream_handler], model="gpt-3.5-turbo-16k")
-        #model = ChatAnthropic(streaming=True, callbacks=[stream_handler], model="claude-2")
+        model = ChatOllama(streaming=True, callbacks=[stream_handler], model="llama3:latest")
         chain = LLMChain(prompt=prompt_template, llm=model)
 
         response = chain({"input":prompt, "chat_history":st.session_state.messages[-20:]}, include_run_info=True)

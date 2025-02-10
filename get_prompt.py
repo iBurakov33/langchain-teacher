@@ -2,9 +2,9 @@ from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder, HumanMess
 from langchain.schema import SystemMessage
 from langchain.memory import ConversationBufferMemory
 
-def load_prompt(content):
 
-	template = """You are an expert educator, and are responsible for walking the user \
+def load_prompt(content):
+    template = """You are an expert educator, and are responsible for walking the user \
 	through this lesson plan. You should make sure to guide them along, \
 	encouraging them to progress when appropriate. \
 	If they ask questions not related to this getting started guide, \
@@ -24,16 +24,16 @@ def load_prompt(content):
 
 	Now remember short response with only 1 code snippet per message.""".format(content=content)
 
-	prompt_template = ChatPromptTemplate(messages = [
-		SystemMessage(content=template), 
-		MessagesPlaceholder(variable_name="chat_history"), 
-		HumanMessagePromptTemplate.from_template("{input}")
-		])
-	return prompt_template
+    prompt_template = ChatPromptTemplate(messages=[
+        SystemMessage(content=template),
+        MessagesPlaceholder(variable_name="chat_history"),
+        HumanMessagePromptTemplate.from_template("{input}")
+    ])
+    return prompt_template
+
 
 def load_prompt_with_questions(content):
-
-	template = """You are an expert educator, and are responsible for walking the user \
+    template = """You are an expert educator, and are responsible for walking the user \
 	through this lesson plan. You should make sure to guide them along, \
 	encouraging them to progress when appropriate. \
 	If they ask questions not related to this getting started guide, \
@@ -70,9 +70,9 @@ def load_prompt_with_questions(content):
 
 	 """.format(content=content)
 
-	prompt_template = ChatPromptTemplate(messages = [
-		SystemMessage(content=template), 
-		MessagesPlaceholder(variable_name="chat_history"), 
-		HumanMessagePromptTemplate.from_template("{input}")
-		])
-	return prompt_template
+    prompt_template = ChatPromptTemplate(messages=[
+        SystemMessage(content=template),
+        MessagesPlaceholder(variable_name="chat_history"),
+        HumanMessagePromptTemplate.from_template("{input}")
+    ])
+    return prompt_template

@@ -1,5 +1,5 @@
 from langchain.callbacks.base import BaseCallbackHandler
-from langchain.chat_models import ChatOpenAI
+from langchain.chat_models import ChatOllama
 from langchain.schema import HumanMessage, AIMessage
 import streamlit as st
 from langsmith import Client
@@ -30,7 +30,6 @@ class StreamHandler(BaseCallbackHandler):
 
 with open("guide.txt", "r") as f:
     guide = f.read()
-from langchain.chat_models import ChatOpenAI
 
 
 
@@ -67,7 +66,7 @@ if prompt := st.chat_input():
 
     with st.chat_message("assistant"):
         stream_handler = StreamHandler(st.empty())
-        model = ChatOpenAI(streaming=True, callbacks=[stream_handler], model="gpt-4")
+        model = ChatOllama(streaming=True, callbacks=[stream_handler], model="llama3:latest")
         chain = LLMChain(prompt=prompt_template, llm=model)
 
         response = chain({"input":prompt, "chat_history":st.session_state.messages[-20:]}, include_run_info=True)
