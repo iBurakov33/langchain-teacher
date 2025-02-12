@@ -3,3 +3,4 @@ streamlit
 anthropic
 pydantic<2
 langchain_ollama
+langchain_community

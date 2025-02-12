@@ -1,15 +1,20 @@
 import streamlit as st
+from langchain_community.chat_models import ChatOllama
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
-from langchain_ollama.chat_models import ChatOllama
 from langchain.schema import HumanMessage, AIMessage
 from langchain.callbacks.base import BaseCallbackHandler
 from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder, HumanMessagePromptTemplate
 from langchain.memory import ConversationBufferMemory
-from get_prompt import load_prompt, load_prompt_with_questions
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 
-st.set_page_config(page_title="LangChain: Getting Started Class")
-st.title("LangChain: Getting Started Class")
+from get_prompt import load_prompt_solve_task, load_prompt_make_task
+from langchain_community.document_loaders import WebBaseLoader
+from langchain_community.chat_models import ChatOllama
+
+
+st.set_page_config(page_title="Интерактивные уроки на английском языке")
+st.title("Интерактивные уроки на английском языке")
 button_css = """.stButton>button {
     color: #4F8BF9;
     border-radius: 50%;
@@ -19,7 +24,7 @@ button_css = """.stButton>button {
 }"""
 st.markdown(f'<style>{button_css}</style>', unsafe_allow_html=True)
 
-MODEL = "deepseek-r1:1.5b"
+MODEL = "gemma2:2b"
 
 
 class StreamHandler(BaseCallbackHandler):
@@ -34,38 +39,19 @@ class StreamHandler(BaseCallbackHandler):
 
 # Lesson selection dictionary
 lesson_guides = {
-    "Lesson 1: Getting Started with LangChain": {
-        "file": "lc_guides/getting_started_guide.txt",
-        "description": "This lesson covers the basics of getting started with LangChain."
+    "Тема 1: Активный и Пассивный залог": {
+        "file": "lessons/passive_voice.txt",
+        "description": "В данной теме рассматривается то, как использовать в предложениях активный и пассивный залог: \
+        правила и примеры с active voice и passive voice."
     },
-    "Lesson 2: Prompts": {
-        "file": "lc_guides/prompt_guide.txt",
-        "description": "This lesson focuses on prompts and their usage."
+    "Тема 2: Формальные подлежащие": {
+        "file": "lessons/it_clause.txt",
+        "description": "В данной теме рассматривается формальное подлежащее it, правила и примеры использования."
     },
-    "Lesson 3: Language Models": {
-        "file": "lc_guides/models_guide.txt",
-        "description": "This lesson provides an overview of language models."
-    },
-    "Lesson 4: Memory": {
-        "file": "lc_guides/memory_guide.txt",
-        "description": "This lesson is about Memory."
-    },
-    "Lesson 5: Chains": {
-        "file": "lc_guides/chains_guide.txt",
-        "description": "This lesson provides information on Chains in LangChain, their types, and usage."
-    },
-    "Lesson 6: Retrieval": {
-        "file": "lc_guides/retrieval_guide.txt",
-        "description": "This lesson provides information on indexing and retrieving information using LangChain."
-    },
-    "Lesson 7: Agents": {
-        "file": "lc_guides/agents_guide.txt",
-        "description": "This lesson provides information on agents, tools, and toolkits."
-    }
 }
 
 # Lesson selection sidebar
-lesson_selection = st.sidebar.selectbox("Select Lesson", list(lesson_guides.keys()))
+lesson_selection = st.sidebar.selectbox("Выбрать тему", list(lesson_guides.keys()))
 
 # Display lesson content and description based on selection
 lesson_info = lesson_guides[lesson_selection]
@@ -73,7 +59,7 @@ lesson_content = open(lesson_info["file"], "r").read()
 lesson_description = lesson_info["description"]
 
 # Radio buttons for lesson type selection
-lesson_type = st.sidebar.radio("Select Lesson Type", ["Instructions based lesson", "Interactive lesson with questions"])
+lesson_type = st.sidebar.radio("Выбрать тип задания", ["Решение задания", "Генерация задания"])
 
 # Clear chat session if dropdown option or radio button changes
 if st.session_state.get("current_lesson") != lesson_selection or st.session_state.get(
@@ -81,7 +67,7 @@ if st.session_state.get("current_lesson") != lesson_selection or st.session_stat
     st.session_state["current_lesson"] = lesson_selection
     st.session_state["current_lesson_type"] = lesson_type
     st.session_state["messages"] = [AIMessage(
-        content="Welcome! This short course will help you get started with LangChain. Let me know when you're all set to jump in!")]
+        content="Добро пожаловать! Выберете тему и тип задания для беседы. Дайте мне знать, когда будете готовы!")]
 
 # Display lesson name and description
 st.markdown(f"**{lesson_selection}**")
@@ -100,10 +86,10 @@ if prompt := st.chat_input():
         stream_handler = StreamHandler(st.empty())
         model = ChatOllama(streaming=True, callbacks=[stream_handler], model=MODEL)
 
-        if lesson_type == "Instructions based lesson":
-            prompt_template = load_prompt(content=lesson_content)
+        if lesson_type == "Решение задания":
+            prompt_template = load_prompt_solve_task(content=lesson_content)
         else:
-            prompt_template = load_prompt_with_questions(content=lesson_content)
+            prompt_template = load_prompt_make_task(content=lesson_content)
 
         chain = prompt_template | model | StrOutputParser()
         #print(prompt_template.invoke(
