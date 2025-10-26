@@ -24,7 +24,7 @@ button_css = """.stButton>button {
 }"""
 st.markdown(f'<style>{button_css}</style>', unsafe_allow_html=True)
 
-MODEL = "gemma2:2b"
+MODEL = "llama3"
 
 
 class StreamHandler(BaseCallbackHandler):

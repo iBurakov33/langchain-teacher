@@ -150,3 +150,15 @@ Responsibilities:
         HumanMessagePromptTemplate.from_template("{input}")
     ])
     return prompt_template
+
+
+def load_prompt_analyze_text(content):
+    template = """You are an expert in English grammar. Your main task is ot analyze the given text and identify all 
+    uses of given grammatical structure in it.
+    """.format(content=content)
+
+    prompt_template = ChatPromptTemplate(messages=[
+        SystemMessage(content=template),
+        HumanMessagePromptTemplate.from_template("{input}")
+    ])
+    return prompt_template
